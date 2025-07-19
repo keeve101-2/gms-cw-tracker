@@ -63,7 +63,7 @@ with tab1:
                         selected = st.pills(
                             label=boss_label,
                             options=[
-                                f"{option.capitalize()}: {difficulties[option]}"
+                                f"{option.capitalize()}: {difficulties[option]:,} points"
                                 for option in options
                             ],
                             selection_mode="multi",
@@ -99,15 +99,15 @@ with tab2:
                 with col:
                     if i + col_num < len(weeks):
                         week_start, week_end = weeks[i + col_num]
+                        points_per_check_in = (
+                            100 if week_start < check_in_cutoff else 200
+                        )
                         check_ins = st.radio(
-                            f"Week {i+col_num+1}: {week_start.strftime('%d %b')} – {week_end.strftime('%d %b')}",
+                            f"{week_start.strftime('%d %b')} – {week_end.strftime('%d %b')}",
                             options=[0, 1, 2, 3, 4, 5],
                             index=0,
                             horizontal=True,
                             key=f"check_ins_{i+col_num}",
-                        )
-                        points_per_check_in = (
-                            100 if week_start < check_in_cutoff else 200
                         )
                         weekly_points = min(check_ins, 5) * points_per_check_in
                         check_in_data.append(
@@ -133,7 +133,7 @@ with tab3:
         total_level_checkpoint_points = 0
         selected_levels = st.pills(
             label="Level Points",
-            options=[f"{level}" for level in level_checkpoints],
+            options=[f"{level}: {points:,} points" for level, points in zip(level_checkpoints, level_checkpoints_points)],
             selection_mode="multi",
             format_func=lambda x: x,
             key="pills_level_points",
@@ -142,7 +142,7 @@ with tab3:
         if selected_levels != []:
             for level in selected_levels:
                 total_level_checkpoint_points += level_checkpoints_points[
-                    level_checkpoints.index(int(level))
+                    level_checkpoints.index(int(level.split(":")[0]))
                 ]
 
 total_points = total_boss_points + total_check_in_points + total_level_checkpoint_points
@@ -152,7 +152,7 @@ for tier, points in zip(tiers, tiers_points):
     if total_points >= points:
         current_tier = tier
 
-st.markdown("## Points Breakdown")
+st.markdown("## Breakdown")
 with st.container(border=True):
     col1, col2, col3 = st.columns(3)
     with col1:
