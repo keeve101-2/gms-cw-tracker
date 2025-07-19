@@ -139,7 +139,8 @@ with st.container(border=True):
     )
     
     if selected_levels != []:
-        total_level_checkpoint_points = sum(level_checkpoints_points[i] for i, level in enumerate(selected_levels))
+        for level in selected_levels:
+            total_level_checkpoint_points += level_checkpoints_points[level_checkpoints.index(int(level))]
 
     st.markdown(f"## Total Level Points: `{total_level_checkpoint_points}`")
 
